@@ -14,6 +14,17 @@ import connectToDB from "./connectToDB";
 // import { app, server } from "./socket/socket.js";
 // import { Server } from "socket.io";
 
+import { IUser } from "./models/user.model"; 
+
+// Below code will make sure that TS knows about User in the Request Object forthe protectRoute
+
+declare module "express-serve-static-core" {
+  interface Request {
+    user?: IUser;
+  }
+}
+
+
 const app: Express = express();
 
 const corsOptions = {
@@ -51,7 +62,7 @@ app.get("*", (req, res) => {
       //   console.log("a user connected");
       // });
       
-const PORT: string | number = process.env.PORT || 3000;
+const PORT: string | number = process.env.PORT || 5555;
 app.listen(PORT, () => {
   console.log(`Server is running on PORT: ${PORT}`);
 });
