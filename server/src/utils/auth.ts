@@ -2,7 +2,8 @@ import jwt from 'jsonwebtoken';
 import  { Response } from "express";
 
 const generateTokenAndSetCookie = (userId: string, res: Response) => {
-    const secret: string = process.env.JWT_SECRET as string
+
+    const secret: string = process.env.JWT_SECRET as string || ''
 	const token = jwt.sign({ userId }, secret, {
 		expiresIn: "15d",
 	});
@@ -13,6 +14,15 @@ const generateTokenAndSetCookie = (userId: string, res: Response) => {
 		sameSite: "strict", // CSRF attacks cross-site request forgery attacks
 		secure: process.env.NODE_ENV !== "development",
 	});
+    
 };
 
-export default generateTokenAndSetCookie;
+const clearToken = (res: Response) => {
+	res.cookie("jwt", "", {
+	  httpOnly: true,
+	  expires: new Date(0),
+	  maxAge: 0
+	});
+  };
+
+export {generateTokenAndSetCookie , clearToken};
