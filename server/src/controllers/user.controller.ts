@@ -3,8 +3,6 @@ import { Request, Response } from "express";
 
 export const getUsersForSidebar = async (req: Request, res: Response) => {
   try {
-    
-    console.log('5')
 
     const loggedInUserId = (req as Request & { user: { _id: string } }).user._id;
 
