@@ -1,19 +1,21 @@
 import { createContext, useState, ReactNode } from "react";
 
+import { User } from "../types";
+
 interface AuthContextType {
-  authUser: boolean;
-  setAuthUser: (user: any) => void;
+  authUser: User | null;
+  setAuthUser: (user: User) => void;
 }
 
 export const AuthContext = createContext<AuthContextType>({
-  authUser: false,
+  authUser: null,
   setAuthUser: () => {},
 });
 
 export const AuthContextProvider: React.FC<{
   children: ReactNode;
 }> = ({ children }) => {
-  const [authUser, setAuthUser] = useState<any>(
+  const [authUser, setAuthUser] = useState<User>(
     JSON.parse(localStorage.getItem("chat-user") || "null")
   );
 

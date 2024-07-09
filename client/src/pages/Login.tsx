@@ -1,14 +1,15 @@
-import { useState } from "react";
+import { useState, SyntheticEvent } from "react";
 import { Link } from "react-router-dom";
 import useLogin from "../hooks/useLogin";
 
 const Login = () => {
+  
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
   const { loading, login } = useLogin();
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: SyntheticEvent) => {
     e.preventDefault();
     await login(username, password);
   };

@@ -7,3 +7,10 @@ export interface conversation {
     gender: string,
     timestamps: string,
 }
+
+export interface User{
+    _id: string,
+    fullName: string,
+    username: string,
+    profilePic: string,
+}
