@@ -4,6 +4,7 @@ import React, {
   useEffect,
   useContext,
   ReactNode,
+  useMemo,
 } from "react";
 import { AuthContext } from "./AuthContext";
 import io, { Socket } from "socket.io-client";
@@ -19,7 +20,10 @@ interface SocketContextProviderProps {
 }
 
 // Create the context with default values
-export const SocketContext = createContext<SocketContextType | undefined>(undefined);
+export const SocketContext = createContext<SocketContextType>({
+  socket: null,
+  onlineUsers: [],
+});
 
 export const SocketContextProvider: React.FC<SocketContextProviderProps> = ({
   children,
@@ -29,7 +33,7 @@ export const SocketContextProvider: React.FC<SocketContextProviderProps> = ({
   const { authUser } = useContext(AuthContext);
 
   useEffect(() => {
-    const func = () => {
+    const setupSocket = () => {
       if (authUser) {
         const newSocket = io("https://chat-app-yt.onrender.com", {
           query: {
@@ -43,7 +47,7 @@ export const SocketContextProvider: React.FC<SocketContextProviderProps> = ({
           setOnlineUsers(users);
         });
 
-        return () => newSocket.close();
+        return newSocket;
       } else {
         if (socket) {
           socket.close();
@@ -51,14 +55,27 @@ export const SocketContextProvider: React.FC<SocketContextProviderProps> = ({
         }
       }
     };
-    func();
+
+    const newSocket = setupSocket();
+
+    return () => {
+      if (newSocket) {
+        newSocket.close();
+      }
+    };
   }, [authUser]);
 
+  const contextValue = useMemo(
+    () => ({
+      socket,
+      onlineUsers,
+    }),
+    [socket, onlineUsers]
+  );
+
   return (
-    <SocketContext.Provider value={{ socket, onlineUsers }}>
+    <SocketContext.Provider value={contextValue}>
       {children}
     </SocketContext.Provider>
   );
 };
-
-

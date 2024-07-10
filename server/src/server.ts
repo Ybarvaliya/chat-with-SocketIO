@@ -24,7 +24,7 @@ declare module "express-serve-static-core" {
 const app: Express = express();
 
 const corsOptions = {
-  origin: "http://localhost:3000", // Change this to the URL of your frontend app
+  origin: "http://localhost:5173", // Change this to the URL of your frontend app
   credentials: true,
 };
 

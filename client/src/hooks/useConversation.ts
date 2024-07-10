@@ -1,8 +1,9 @@
 import { create } from "zustand";
+import { ConversationType } from "../types";
 
 interface ConversationState {
-  selectedConversation: string | null;
-  setSelectedConversation: (selectedConversation: string | null) => void;
+  selectedConversation: ConversationType | null;
+  setSelectedConversation: (selectedConversation: ConversationType) => void;
   messages: string[];
   setMessages: (messages: string[]) => void;
 }

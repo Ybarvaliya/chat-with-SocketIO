@@ -8,7 +8,7 @@ import useLogout from "../hooks/useLogout";
 import { getRandomEmoji } from "../utils/emojis";
 import { BiLogOut } from "react-icons/bi";
 
-import { conversation } from "../types";
+import { ConversationType } from "../types";
 
 const Home = () => {
   return (
@@ -31,7 +31,7 @@ const Sidebar = () => {
         <div className="divider px-3"></div>
 
         <div className="py-2 flex flex-col overflow-auto">
-          {conversations.map((conv: conversation, idx) => (
+          {conversations.map((conv: ConversationType, idx) => (
             <Conversation
               key={conv._id}
               conversation={conv}

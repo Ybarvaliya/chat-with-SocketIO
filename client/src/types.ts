@@ -1,12 +1,12 @@
-export interface conversation {
-    _id: number,
-    fullName: string,
-    username: string,
-    password: string,
-    profilePic: string,
-    gender: string,
-    timestamps: string,
-}
+// export interface conversation {
+//     _id: number,
+//     fullName: string,
+//     username: string,
+//     password: string,
+//     profilePic: string,
+//     gender: string,
+//     timestamps: string,
+// }
 
 export interface User{
     _id: string,
@@ -14,3 +14,10 @@ export interface User{
     username: string,
     profilePic: string,
 }
+
+export interface ConversationType {
+    _id: string;
+    fullName: string;
+    profilePic: string;
+  }
+  
