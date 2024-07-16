@@ -1,6 +1,6 @@
 import { useState, SyntheticEvent } from "react";
 import { Link } from "react-router-dom";
-import useLogin from "../hooks/useLogin";
+import useLogin from "../hooks/AuthHooks/useLogin";
 
 const Login = () => {
   

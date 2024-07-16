@@ -1,74 +1,73 @@
-import Conversation from "../models/conversation.model";
 import Message from "../models/message.model";
-import { getReceiverSocketId, io } from "../socket/socket";
+import User from "../models/user.model";
+import Chat from "../models/chat.model";
 import { Request, Response } from "express";
+import { getReceiverSocketId, io } from "../socket/socket";
 
-export const sendMessage = async (req: Request, res: Response) => {
+const sendMessage = async (req: Request, res: Response) => {
+  const { message } = req.body;
+  const chatId = req.params.chatId;
+
+  if (!message || !chatId) {
+    console.log("Invalid data passed into request");
+
+    return res
+      .status(400)
+      .json({ error: "Please Provide All Fields To send Message" });
+  }
+
+  var newMessage = {
+    sender: req.user?._id,
+    message: message,
+    chat: chatId,
+  };
+
   try {
-    const { message } = req.body;
-    const { id: receiverId } = req.params;
-    const senderId = (req as Request & { user: { _id: string } }).user._id;;
+    let m = await Message.create(newMessage);
 
-    let conversation = await Conversation.findOne({
-      participants: { $all: [senderId, receiverId] },
+    m = await m.populate("sender", "name");
+    m = await m.populate("chat");
+    const populatedM = await User.populate(m, {
+      path: "chat.users",
+      select: "name email _id",
     });
 
-    if (!conversation) {
-      conversation = await Conversation.create({
-        participants: [senderId, receiverId],
-      });
-    }
+    await Chat.findByIdAndUpdate(
+      chatId,
+      { latestMessage: populatedM },
+      { new: true }
+    );
 
-    const newMessage = new Message({
-      senderId,
-      receiverId,
-      message,
-    });
-
-    if (newMessage) {
-      conversation.messages.push(newMessage._id);
-    }
-
-    // this will run in parallel
-    await Promise.all([conversation.save(), newMessage.save()]);
-
-    // SOCKET IO FUNCTIONALITY
-    const receiverSocketId = getReceiverSocketId(receiverId);
+    const { recieverId } = req.params;
+    const receiverSocketId = getReceiverSocketId(recieverId);
     if (receiverSocketId) {
-      // io.to(<socket_id>).emit() used to send events to specific client
       io.to(receiverSocketId).emit("newMessage", newMessage);
     }
 
-    res.status(201).json(newMessage);
+    res.status(200).json(m);
   } catch (error) {
-    if (error instanceof Error)
-      console.log("Error in sendMessages controller: ", error.message);
-    else console.log("Unknown Error in sendMessages controller");
-
-    res.status(500).json({ error: "Internal server error" });
+    if (error instanceof Error) console.error(error.message);
+    res
+      .status(400)
+      .json({ Error: "Error in Message Contoller - Send Message" });
   }
 };
 
-export const getMessages = async (req: Request, res: Response) => {
+const allMessages = async (req: Request, res: Response) => {
   try {
-    const { id: userToChatId } = req.params;
-    const senderId = (req as Request & { user: { _id: string } }).user._id;
-    // const senderId = req.user._id
+    const { chatId } = req.params;
 
-    const conversation = await Conversation.findOne({
-      participants: { $all: [senderId, userToChatId] },
-    }).populate("messages"); // NOT REFERENCE BUT ACTUAL MESSAGES
+    const getMessage = await Message.find({ chat: chatId })
+      .populate("sender", "name email _id")
+      .populate("chat");
 
-    if (!conversation) return res.status(200).json([]);
-
-    const messages = conversation.messages;
-
-    res.status(200).json(messages);
+    res.status(200).json(getMessage);
   } catch (error) {
-    if (error instanceof Error)
-      console.log("Error in getMessages controller: ", error.message);
-    else console.log("Unknown Error in getMessages controller");
-
-    res.status(500).json({ error: "Internal server error" });
+    if (error instanceof Error) console.error(error.message);
+    res
+      .status(400)
+      .json({ Error: "Error in Message Contoller - All Messages" });
   }
 };
+
+export { allMessages, sendMessage };

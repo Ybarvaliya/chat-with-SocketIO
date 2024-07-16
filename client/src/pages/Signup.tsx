@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { SyntheticEvent, useState } from "react";
-import useSignup from "../hooks/useSignup";
+import useSignup from "../hooks/AuthHooks/useSignup";
 
 const Signup = () => {
   const [inputs, setInputs] = useState({
@@ -37,7 +37,7 @@ const Signup = () => {
             <input
               type="text"
               placeholder="John Doe"
-              className="w-full input input-bordered  h-10"
+              className="w-full input input-bordered  h-10 my-2 rounded-lg p-4"
               value={inputs.fullName}
               onChange={(e) =>
                 setInputs({ ...inputs, fullName: e.target.value })
@@ -46,13 +46,13 @@ const Signup = () => {
           </div>
 
           <div>
-            <label className="label p-2 ">
-              <span className="text-base label-text">Username</span>
+            <label className="label p-2">
+              <span className="text-base label-text ">Username</span>
             </label>
             <input
               type="text"
               placeholder="johndoe"
-              className="w-full input input-bordered h-10"
+              className="w-full input input-bordered h-10 my-2 rounded-lg p-4"
               value={inputs.username}
               onChange={(e) =>
                 setInputs({ ...inputs, username: e.target.value })
@@ -67,7 +67,7 @@ const Signup = () => {
             <input
               type="password"
               placeholder="Enter Password"
-              className="w-full input input-bordered h-10"
+              className="w-full input input-bordered h-10 my-2 rounded-lg p-4"
               value={inputs.password}
               onChange={(e) =>
                 setInputs({ ...inputs, password: e.target.value })
@@ -82,7 +82,7 @@ const Signup = () => {
             <input
               type="password"
               placeholder="Confirm Password"
-              className="w-full input input-bordered h-10"
+              className="w-full input input-bordered h-10 my-2 rounded-lg p-4"
               value={inputs.confirmPassword}
               onChange={(e) =>
                 setInputs({ ...inputs, confirmPassword: e.target.value })
@@ -97,14 +97,14 @@ const Signup = () => {
 
           <Link
             to={"/login"}
-            className="text-sm hover:underline hover:text-blue-600 mt-2 inline-block"
+            className="text-sm text-white hover:underline hover:text-blue-600 mt-2 inline-block "
           >
             Already have an account?
           </Link>
 
           <div>
             <button
-              className="btn btn-block btn-sm mt-2 border border-slate-700"
+              className="btn btn-block btn-sm mt-2 border border-slate-700 bg-white p-2 rounded-2xl"
               disabled={loading}
             >
               {loading ? (

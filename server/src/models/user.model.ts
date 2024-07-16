@@ -6,9 +6,9 @@ export interface IUser extends Document {
   username: string;
   password: string;
   gender: "male" | "female";
-  profilePic: string;
-  createdAt: Date;
-  updatedAt: Date;
+  profilePic?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 const userSchema = new Schema<IUser>(
@@ -19,12 +19,12 @@ const userSchema = new Schema<IUser>(
     },
     username: {
       type: String,
-      required: true,
+      required: [true, "Please Provide a Username"],
       unique: true,
     },
     password: {
       type: String,
-      required: true,
+      required: [true, "Please Provide Password"],
       minlength: 6,
     },
     gender: {
@@ -36,7 +36,6 @@ const userSchema = new Schema<IUser>(
       type: String,
       default: "",
     },
-    // createdAt, updatedAt => Member since <createdAt>
   },
   { timestamps: true }
 );
