@@ -15,9 +15,9 @@ export interface ChatType {
 }
 
 export interface MessageType {
-  _id: string;
+  id: string;
+  sender: string;
+  receiver: string;
   message: string;
-  senderId?: string;
-  createdAt?: string;
-  updatedAt?: string;
+  createdAt: Date;
 }

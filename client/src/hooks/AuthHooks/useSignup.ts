@@ -35,6 +35,7 @@ const useSignup = () => {
       const res = await fetch("http://localhost:5555/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({
           fullName,
           username,

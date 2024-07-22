@@ -10,6 +10,8 @@ const useSendMessage = () => {
   const sendMessage = async (message: MessageType) => {
     setLoading(true);
     try {
+      const msg: string = message.message;
+      console.log(selectedChat?._id, "yuval", msg);
       const res = await fetch(
         `http://localhost:5555/message/send/${selectedChat?._id}`,
         {
@@ -17,7 +19,8 @@ const useSendMessage = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ message }),
+          credentials: "include",
+          body: JSON.stringify({ msg }),
         }
       );
       const data = await res.json();

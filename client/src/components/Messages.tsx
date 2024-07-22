@@ -23,7 +23,7 @@ const Messages = () => {
         }
       }, 100);
     }
-
+    
     // Update prevMessages.current after the effect logic
     prevMessages.current = messages;
   }, [messages]);
@@ -33,7 +33,7 @@ const Messages = () => {
       {!loading &&
         messages.length > 0 &&
         messages.map((message: MessageType) => (
-          <div key={message._id} ref={lastMessageRef}>
+          <div key={message.id} ref={lastMessageRef}>
             <Message mess={message} />
           </div>
         ))}
@@ -49,49 +49,41 @@ const Messages = () => {
 export default Messages;
 
 const Message = ({ mess }: { mess: MessageType }) => {
-  
   const { authUser } = useContext(AuthContext);
   const { selectedChat } = useContext(ChatContext)!;
-  const formattedTime = extractTime(mess.createdAt!);
+  const formattedTime = extractTime(mess.createdAt.toString());
 
-  const fromMe = mess.senderId === authUser?._id;
-  const chatClassName = fromMe ? "chat-end" : "chat-start";
+  const fromMe = mess.sender === authUser?._id;
+  const chatClassName = fromMe ? "justify-end" : "justify-start";
   const profilePic = fromMe ? authUser?.profilePic : selectedChat?.profilePic;
-  const bubbleBgColor = fromMe ? "bg-blue-500" : "";
+  const bubbleBgColor = fromMe ? "bg-blue-500" : "bg-gray-700";
 
   return (
-    <div className={`chat ${chatClassName}`}>
-      <div className="chat-image avatar">
-        <div className="w-10 rounded-full">
-          <img alt="Tailwind CSS chat bubble component" src={profilePic} />
+    <div className={`flex items-end mb-4 ${chatClassName}`}>
+      {!fromMe && (
+        <div className="w-10 h-10 rounded-full overflow-hidden">
+          <img src={profilePic} alt="Profile" />
         </div>
-      </div>
-      <div className={`chat-bubble text-white ${bubbleBgColor} pb-2`}>
+      )}
+      <div className={`max-w-xs mx-2 p-3 rounded-lg ${bubbleBgColor} text-white shadow-lg`}>
         {mess.message}
       </div>
-      <div className="chat-footer opacity-50 text-xs flex gap-1 items-center">
+      <div className="text-xs text-gray-400 ml-2">
         {formattedTime}
       </div>
+      {fromMe && (
+        <div className="w-10 h-10 rounded-full overflow-hidden">
+          <img src={profilePic} alt="Profile" />
+        </div>
+      )}
     </div>
   );
 };
 
-const MessageSkeleton = () => {
-  return (
-    <>
-      <div className="flex gap-3 items-center">
-        <div className="skeleton w-10 h-10 rounded-full shrink-0"></div>
-        <div className="flex flex-col gap-1">
-          <div className="skeleton h-4 w-40"></div>
-          <div className="skeleton h-4 w-40"></div>
-        </div>
-      </div>
-      <div className="flex gap-3 items-center justify-end">
-        <div className="flex flex-col gap-1">
-          <div className="skeleton h-4 w-40"></div>
-        </div>
-        <div className="skeleton w-10 h-10 rounded-full shrink-0"></div>
-      </div>
-    </>
-  );
-};
+const MessageSkeleton = () => (
+  <div className="flex items-end mb-4">
+    <div className="w-10 h-10 bg-gray-200 rounded-full animate-pulse"></div>
+    <div className="max-w-xs mx-2 p-3 rounded-lg bg-gray-200 text-white shadow-lg animate-pulse"></div>
+    <div className="text-xs text-gray-200 ml-2 animate-pulse">•••</div>
+  </div>
+);

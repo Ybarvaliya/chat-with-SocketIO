@@ -6,6 +6,7 @@ const useLogin = () => {
 
 	const [loading, setLoading] = useState(false);
 	const { setAuthUser } = useContext(AuthContext);
+	
 
 	const login = async (username: string, password: string) => {
 		const success = handleInputErrors(username, password);
@@ -16,6 +17,7 @@ const useLogin = () => {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ username, password }),
+				credentials: "include",
 			});
 
 			const data = await res.json();
@@ -25,7 +27,7 @@ const useLogin = () => {
 
 			localStorage.setItem("chat-user", JSON.stringify(data));
 			setAuthUser(data);
-            
+			
 		} catch (error) {
 			if(error instanceof Error) toast.error(error.message);
 			else console.log('Error in useLogin Hook')

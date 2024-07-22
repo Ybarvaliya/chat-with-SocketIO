@@ -15,7 +15,7 @@ import { BiLogOut } from "react-icons/bi";
 
 const Home = () => {
   return (
-    <div className="flex sm:h-[450px] md:h-[550px] rounded-lg overflow-hidden bg-gray-400 bg-clip-padding backdrop-filter backdrop-blur-lg bg-opacity-0">
+    <div className="flex sm:h-[450px] md:h-[550px] rounded-lg overflow-hidden bg-gray-400 bg-clip-padding backdrop-filter backdrop-blur-lg bg-opacity-0 w-[75%] h-[90%]">
       <Sidebar />
       <ChatContainer />
     </div>
@@ -28,7 +28,7 @@ const Sidebar = () => {
   const { onlineUsers } = useContext(SocketContext);
   return (
     <>
-      <div className="border-r border-slate-500 p-4 flex flex-col">
+      <div className="border-r border-slate-500 p-4 flex flex-col w-[25%] h-[100%]">
         <SearchInput />
 
         <div className="divider px-3"></div>

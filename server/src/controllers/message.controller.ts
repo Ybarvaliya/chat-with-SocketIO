@@ -1,73 +1,77 @@
-import Message from "../models/message.model";
-import User from "../models/user.model";
+import Message, {IMessage} from "../models/message.model";
 import Chat from "../models/chat.model";
 import { Request, Response } from "express";
 import { getReceiverSocketId, io } from "../socket/socket";
+import { Types } from "mongoose";
 
 const sendMessage = async (req: Request, res: Response) => {
-  const { message } = req.body;
-  const chatId = req.params.chatId;
-
-  if (!message || !chatId) {
-    console.log("Invalid data passed into request");
-
-    return res
-      .status(400)
-      .json({ error: "Please Provide All Fields To send Message" });
-  }
-
-  var newMessage = {
-    sender: req.user?._id,
-    message: message,
-    chat: chatId,
-  };
-
   try {
-    let m = await Message.create(newMessage);
+    const message  = req.body.msg;
+    const receiverId  = req.params.recieverId;
+    const sId = req.user?._id as Types.ObjectId;
+    const senderId = sId.toString();
+    
+    console.log(message, receiverId, senderId);
 
-    m = await m.populate("sender", "name");
-    m = await m.populate("chat");
-    const populatedM = await User.populate(m, {
-      path: "chat.users",
-      select: "name email _id",
+    const newMessage = await Message.create({
+      sender: senderId,
+      receiver: receiverId,
+      message,
     });
 
-    await Chat.findByIdAndUpdate(
-      chatId,
-      { latestMessage: populatedM },
-      { new: true }
-    );
+    let chat = await Chat.findOne({
+      users: { $all: [senderId, receiverId] },
+    });
+    
+    if (chat) {
+      chat.messages?.push(newMessage._id);
+    }
+    else{
+      chat = await Chat.create({
+        users: [senderId, receiverId],
+        messages: [newMessage]
+      });
+    }
+    
+    // this will run in parallel
+    await Promise.all([chat.save(), newMessage.save()]);
 
-    const { recieverId } = req.params;
-    const receiverSocketId = getReceiverSocketId(recieverId);
+    const receiverSocketId = getReceiverSocketId(receiverId);
+    console.log(receiverSocketId)
     if (receiverSocketId) {
       io.to(receiverSocketId).emit("newMessage", newMessage);
     }
 
-    res.status(200).json(m);
+    res.status(201).json(newMessage);
   } catch (error) {
-    if (error instanceof Error) console.error(error.message);
-    res
-      .status(400)
-      .json({ Error: "Error in Message Contoller - Send Message" });
+    if (error instanceof Error)
+      console.log("Error in sendMessage controller: ", error.message);
+    else console.log("Error in sendMessage controller");
+    res.status(500).json({ error: "Internal server error" });
   }
+
 };
 
-const allMessages = async (req: Request, res: Response) => {
-  try {
-    const { chatId } = req.params;
+const getMessages = async (req: Request, res: Response) => {
+	try {
+		const recieverId = req.params.recieverId;
+		const senderId = req.user?._id;
 
-    const getMessage = await Message.find({ chat: chatId })
-      .populate("sender", "name email _id")
-      .populate("chat");
+		const chat = await Chat.findOne({
+			users: { $all: [senderId, recieverId] },
+		}).populate("messages"); // NOT REFERENCE BUT ACTUAL MESSAGES
 
-    res.status(200).json(getMessage);
-  } catch (error) {
-    if (error instanceof Error) console.error(error.message);
-    res
-      .status(400)
-      .json({ Error: "Error in Message Contoller - All Messages" });
-  }
+		if (!chat) return res.status(200).json([]);
+		const messages = chat.messages;
+
+		res.status(200).json(messages);
+	} catch (error) {
+    if (error instanceof Error)
+      console.log("Error in getMessage controller: ", error.message);
+    else console.log("Error in getMessage controller");
+		res.status(500).json({ error: "Internal server error" });
+	}
 };
 
-export { allMessages, sendMessage };
+
+export { getMessages, sendMessage };

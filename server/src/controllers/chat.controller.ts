@@ -60,13 +60,19 @@ const getChats = async (req: Request, res: Response) => {
   // });
 
   // res.status(201).json(user);
+  try{
+    
+    const loggedInUserId = req.user?._id;
+    const filteredUsers = await User.find({
+      _id: { $ne: loggedInUserId },
+    }).select("-password");
+  
+    res.status(200).json(filteredUsers);
+  }
+  catch(err){
+    res.json({"Error": err})
+  }
 
-  const loggedInUserId = req.user?._id;
-  const filteredUsers = await User.find({
-    _id: { $ne: loggedInUserId },
-  }).select("-password");
-
-  res.status(200).json(filteredUsers);
 };
 
 // To create Group

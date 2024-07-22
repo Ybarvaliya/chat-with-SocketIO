@@ -1,26 +1,16 @@
 import { Server, Socket } from "socket.io";
 import http from "http";
 import express from "express";
-import cors from "cors";
 
 const app = express();
 
-app.use(cors({
-	origin: 'http://localhost:5173', 
-	methods: ['GET', 'POST'],
-	allowedHeaders: ['Content-Type'],
-	credentials: true,
-  }));
-
 const server = http.createServer(app);
-
 const io = new Server(server, {
-  cors: {
-    origin: ["http://localhost:5173"],
-    methods: ["GET", "POST"],
-    allowedHeaders: ["Content-Type"],
+	cors: {
+		origin: ["http://localhost:5173"],
     credentials: true,
-  },
+    methods: ["GET", "POST"]
+	},
 });
 
 interface UserSocketMap {
@@ -34,6 +24,7 @@ export const getReceiverSocketId = (receiverId: string): string | undefined => {
 };
 
 io.on("connection", (socket: Socket) => {
+  
   console.log("a user connected", socket.id);
 
   const userId = socket.handshake.query.userId as string;

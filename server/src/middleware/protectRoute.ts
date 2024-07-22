@@ -22,12 +22,14 @@ const protectRoute = async (
     if (!decoded || !decoded.userId)
       return res.status(401).json({ error: "Unauthorized - Invalid Token" });
 
-    const user: IUser | null = await User.findById(decoded.userId).select("-password");
+    const user: IUser | null = await User.findById(decoded.userId).select(
+      "-password"
+    );
 
     if (!user) return res.status(404).json({ error: "User not found" });
 
     req.user = user;
-    next(); 
+    next();
   } catch (error) {
     console.error("Error in protectRoute middleware:", error);
     res.status(500).json({ error: "Internal server error" });

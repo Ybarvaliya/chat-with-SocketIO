@@ -6,8 +6,8 @@ import { IMessage } from "./message.model";
 interface IChat extends Document {
   chatName?: string;
   isGroupChat?: boolean;
-  users: Types.ObjectId[] | IUser[];
-  latestMessage?: Types.ObjectId | IMessage;
+  users: Types.ObjectId[];
+  messages?: Types.ObjectId[];
   groupAdmin?: Types.ObjectId | IUser;
   createdAt?: Date;
   updatedAt?: Date;
@@ -28,16 +28,21 @@ const chatSchema: Schema = new Schema<IChat>(
       {
         type: Types.ObjectId,
         ref: "User",
+        default: [],
       },
     ],
-    latestMessage: {
-      type: Types.ObjectId,
-      ref: "Message",
-    },
+    messages: [
+			{
+				type: Types.ObjectId,
+				ref: "Message",
+				default: [],
+			},
+		],
     groupAdmin: {
       type: Types.ObjectId,
       ref: "User",
     },
+		
   },
   { timestamps: true }
 );

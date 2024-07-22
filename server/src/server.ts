@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-import express from "express";
+import express, {Request, Response} from "express";
 import cors from "cors";
 import path from "path";
 import cookieParser from "cookie-parser";
@@ -14,7 +14,6 @@ import connectToDB from "./connectToDB";
 import { IUser } from "./models/user.model";
 import protectRoute from "./middleware/protectRoute";
 
-import { Server } from "socket.io";
 import { app, server } from "./socket/socket";
 
 // Below code will make sure that TS knows about User in the Request Object for the protectRoute
@@ -27,12 +26,10 @@ declare module "express-serve-static-core" {
 
 app.use(cors({
   origin: 'http://localhost:5173', 
-  methods: ['GET', 'POST'],
-  allowedHeaders: ['Content-Type'],
   credentials: true,
 }));
 
-app.use(cookieParser());
+app.use(cookieParser(process.env.COOKIE_SECRET));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -41,23 +38,11 @@ app.use("/auth", authRoutes);
 app.use("/chat", protectRoute, chatRoutes);
 app.use("/message", protectRoute, messageRoutes);
 
-app.use(express.static(path.join(__dirname, "/frontend/dist")));
+// app.use(express.static(path.join(__dirname, "/frontend/dist")));
 
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"));
-});
-
-const io = new Server(server, {
-  cors: {
-    origin: "http://localhost:3000", // URL of your frontend app
-    methods: ["GET", "POST"],
-    credentials: true,
-  },
-});
-
-io.on("connection", (socket) => {
-  console.log("a user connected");
-});
+// app.get("*", (req, res) => {
+//   res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"));
+// });
 
 const PORT: string | number = process.env.PORT || 5555;
 

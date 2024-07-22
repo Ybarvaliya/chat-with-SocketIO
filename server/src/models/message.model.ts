@@ -5,8 +5,9 @@ import { IChat } from "./chat.model";
 // Interface for Message
 interface IMessage extends Document {
   sender: Types.ObjectId | IUser;
+  receiver: Types.ObjectId | IUser;
   message: string;
-  chat: Types.ObjectId | IChat;
+  _id: Types.ObjectId
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -19,15 +20,20 @@ const messageSchema: Schema = new Schema<IMessage>(
       ref: "User",
       required: true,
     },
+    receiver: {
+			type: Types.ObjectId,
+			ref: "User",
+			required: true,
+		},
     message: {
       type: String,
       required: true,
     },
-    chat: {
-      type: Types.ObjectId,
-      ref: "Chat",
-      required: true,
-    },
+    // chat: {
+    //   type: Types.ObjectId,
+    //   ref: "Chat",
+    //   required: true,
+    // },
   },
   { timestamps: true }
 );
